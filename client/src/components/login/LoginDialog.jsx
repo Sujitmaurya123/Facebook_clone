@@ -1,5 +1,7 @@
-import React,{useState} from 'react'
+import React,{useState,useContext} from 'react'
 import {Dialog,Box,TextField, Button, Typography,styled} from '@mui/material'
+import { authenticateSignup } from '../../service/api';
+import { DataContext } from '../../context/DataProvider';
 
 const Component =styled(Box)`
 height:70vh;
@@ -79,7 +81,8 @@ const LoginDialog = ({open,setOpen}) => {
 
    const [ account, toggleAccount ] = useState(accountInitialValues.login);
    const [signup,setSignup]=useState(signupInitialValues)
-
+  
+const {setAccount}=useContext(DataContext);
     const handleClose=()=>{
         setOpen(false);
         toggleAccount(accountInitialValues.login)
@@ -93,11 +96,16 @@ const LoginDialog = ({open,setOpen}) => {
 
     const onInputChange = (e) => {
         setSignup({ ...signup, [e.target.name]: e.target.value });
-        console.log(signup);
+        // console.log(signup);
     }
 
-    const signupUser=()=>{
-        
+    const signupUser = async() => {
+       
+        let response = await authenticateSignup(signup);
+    //    console.log(response)
+        if(!response) return;
+        handleClose(); 
+        setAccount(signup.firstname);
     }
 
   return (
@@ -130,6 +138,7 @@ const LoginDialog = ({open,setOpen}) => {
                  <TextField variant="standard" onChange={(e) => onInputChange(e)} name='username' label='Enter Username' />
                  <TextField variant="standard" onChange={(e) => onInputChange(e)} name='email' label='Enter Email' />
                  <TextField variant="standard" onChange={(e) => onInputChange(e)} name='password' label='Enter Password' />
+                 <TextField variant="standard" onChange={(e) => onInputChange(e)} name='phone' label='Enter Phone' />
                 <RequestOTP>Request OTP</RequestOTP>
                 <LoginButton onClick={() => signupUser()} >Continue</LoginButton>
              </Wrapper>
